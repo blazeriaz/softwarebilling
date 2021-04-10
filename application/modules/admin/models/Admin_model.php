@@ -8,6 +8,7 @@ class Admin_model extends CI_Model {
     public function __construct()
     {
         $this->load->database();
+		$this->load->model('base_model');
     } 
 	public function get_counts($table, $condition=array(),$option="") 
 	{  	
@@ -33,26 +34,44 @@ class Admin_model extends CI_Model {
 	}
 	
 	public function getChartPurchase(){
-		
-		$this->db->select("sum(p.total_value) as grand_total,YEAR(p.created) AS yr, MONTH(p.created) AS m");
-		
-		$current_year = date('Y');
-		
-		$this->db->where('YEAR(p.created)',$current_year);
+
+		$whereyear[] = array(FALSE,"(YEAR(from_date) <= YEAR(CURDATE()) and MONTH(from_date) >= 4)");
+		$academic_year = $this->base_model->get_advance_list('academic_year ay', [], '*', $whereyear, '', 'id', 'asc', 'id');		
+		$this->db->select("sum(p.total_value) as grand_total,YEAR(p.created) AS yr, MONTH(p.created) AS m");		
+		$current_year = date('Y');		
+		//$this->db->where('YEAR(p.created)',$current_year);
+		if(isset($_SESSION['academic_year_id'])){
+			$data['current_year_selected'] = $_SESSION['academic_year_id'];
+			$order_year_from = $this->session->userdata('order_year_from');
+			$order_year_to = $this->session->userdata('order_year_to');
+			$current_from_order = date('Y-m-d',strtotime($order_year_from));
+			$current_to_order = date('Y-m-d',strtotime($order_year_to));
+			$where = "(DATE_FORMAT(p.created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(p.created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";
+		}else{
+		foreach($academic_year as $year){
+			if($current_year == date('Y',strtotime($year['from_date']))){
+				$data['current_year_selected'] = $year['id'];
+				$current_from_order = date('Y-m-d',strtotime($year['from_date']));
+				$current_to_order = date('Y-m-d',strtotime($year['to_date']));
+				$where = "(DATE_FORMAT(p.created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(p.created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";
+			}
+		}
+	}
+	    $this->db->where($where);
 		$this->db->group_by(array("YEAR(p.created)", "MONTH(p.created)"));
 		$orders_arr = $this->db->get('new_purchase p')->result_array();
 		$chart_data = [];
 		$new_data = array();
-		if(count($orders_arr) > 0){
-			
+		if(count($orders_arr) > 0){			
 			foreach($orders_arr as $sale){				
 				$chart_data[$sale['m']] = round($sale['grand_total']);			
 			}
-			for($i=1; $i<=12;$i++){
-				if(isset($chart_data[$i])){
-					$new_data[$i] = $chart_data[$i];
+			$month_key = array(4,5,6,7,8,9,10,11,12,1,2,3);
+			foreach($month_key as $value){
+				if(isset($chart_data[$value])){
+					$new_data[$value] = $chart_data[$value];
 				}else{
-					$new_data[$i] = 0;
+					$new_data[$value] = 0;
 				}
 				
 			}
@@ -62,17 +81,41 @@ class Admin_model extends CI_Model {
 	}
 	
 	public function getChartSales(){
-		
+
+		$whereyear[] = array(FALSE,"(YEAR(from_date) <= YEAR(CURDATE()) and MONTH(from_date) >= 4)");
+		$academic_year = $this->base_model->get_advance_list('academic_year ay', [], '*', $whereyear, '', 'id', 'asc', 'id');
 		// SELECT sum(grand_total) as grand_total,YEAR(created) AS yr, MONTH(created) AS m from orders where YEAR(created) = '2020' GROUP BY YEAR(created), MONTH(created)
 		
 		$this->db->select("sum(o.grand_total) as grand_total,YEAR(o.created) AS yr, MONTH(o.created) AS m");
 		
 		$current_year = date('Y');
+
+		if(isset($_SESSION['academic_year_id'])){
+			$data['current_year_selected'] = $_SESSION['academic_year_id'];
+			$order_year_from = $this->session->userdata('order_year_from');
+			$order_year_to = $this->session->userdata('order_year_to');
+			$current_from_order = date('Y-m-d',strtotime($order_year_from));
+			$current_to_order = date('Y-m-d',strtotime($order_year_to));
+			$where = "(DATE_FORMAT(o.created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(o.created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";
+		}else{
+		foreach($academic_year as $year){
+
+			if($current_year == date('Y',strtotime($year['from_date']))){
+				$data['current_year_selected'] = $year['id'];
+				$current_from_order = date('Y-m-d',strtotime($year['from_date']));
+				$current_to_order = date('Y-m-d',strtotime($year['to_date']));
+				$where = "(DATE_FORMAT(o.created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(o.created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";
+			}
+		}
+	}
 		
-		$this->db->where('YEAR(o.created)',$current_year);
+		
+		$this->db->where($where);
 		$this->db->group_by(array("YEAR(created)", "MONTH(created)"));
 		$orders_arr = $this->db->get('orders o')->result_array();
-		//echo '<pre>';print_r($orders_arr);
+
+		//echo $this->db->last_query();
+		
 		$chart_data = [];
 		$new_data = array();
 		if(count($orders_arr) > 0){
@@ -80,14 +123,18 @@ class Admin_model extends CI_Model {
 			foreach($orders_arr as $sale){				
 				$chart_data[$sale['m']] = round($sale['grand_total']);			
 			}
-			for($i=1; $i<=12;$i++){
-				if(isset($chart_data[$i])){
-					$new_data[$i] = $chart_data[$i];
+			
+			$month_key = array(4,5,6,7,8,9,10,11,12,1,2,3);
+			foreach($month_key as $value){
+				if(isset($chart_data[$value])){
+					$new_data[$value] = $chart_data[$value];
 				}else{
-					$new_data[$i] = 0;
+					$new_data[$value] = 0;
 				}
 				
 			}
+			//exit;
+		//echo '<pre>';print_r($new_data);exit;
 			
 		}
 		return $new_data;

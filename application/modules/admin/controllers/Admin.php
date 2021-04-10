@@ -74,57 +74,81 @@ class Admin extends Admin_Controller
 				$all_total_sold_qly = 0;				
 					
 				#total user 
-				$data["total_users"] = $this->Admin_model->get_counts("users");
-
-				#total orders 
-      				  $where = '(created >= "2018-02-11")';				 
-				$data["total_orders"] = $this->Admin_model->get_counts("orders", $where);
+				$data["total_users"] = $this->Admin_model->get_counts("users");				
 
 				//Last 5 Users
-				$data['latest_users'] = $this->Admin_model->get_last_registered_users(5);
+				//$data['latest_users'] = $this->Admin_model->get_last_registered_users(5);
 				
-				$data['sales_amount_chart'] = $this->Admin_model->getChartSales();
+				$data['sales_amount_chart'] = $this->Admin_model->getChartSales();				
+				
 				$data['purchase_amount_chart'] = $this->Admin_model->getChartPurchase();
-				
-				
 
-				$month_name = array(
-								'January',
-								'February',
-								'March', 
+				$whereyear[] = array(FALSE,"(YEAR(from_date) <= YEAR(CURDATE()) and MONTH(from_date) >= 4)");
+				$academic_year = $this->base_model->get_advance_list('academic_year ay', [], '*', $whereyear, '', 'id', 'asc', 'id');
+				$curr_year = date('Y');
+				$data['current_year_selected'] = 1;
+
+				#total orders 
+				//$where = '(created >= "2018-02-11")';	
+
+				if(isset($_SESSION['academic_year_id'])){
+					$data['current_year_selected'] = $_SESSION['academic_year_id'];
+					$order_year_from = $this->session->userdata('order_year_from');
+					$order_year_to = $this->session->userdata('order_year_to');
+					$current_from_order = date('Y-m-d',strtotime($order_year_from));
+					$current_to_order = date('Y-m-d',strtotime($order_year_to));
+					$where = "(DATE_FORMAT(created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";
+				}else{
+				foreach($academic_year as $year){
+		
+					if($curr_year == date('Y',strtotime($year['from_date']))){
+						$data['current_year_selected'] = $year['id'];
+						$current_from_order = date('Y-m-d',strtotime($year['from_date']));
+						$current_to_order = date('Y-m-d',strtotime($year['to_date']));
+						$where = "(DATE_FORMAT(created,'%Y-%m-%d') >= DATE_FORMAT('".$current_from_order."','%Y-%m-%d') AND DATE_FORMAT(created,'%Y-%m-%d') <= DATE_FORMAT('".$current_to_order."','%Y-%m-%d'))";				
+					}
+				}
+			}
+				
+				
+			$data["total_orders"] = $this->Admin_model->get_counts("orders", $where);
+			$month_name = array(								
 								'April', 
-								'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+								'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December','January',
+								'February',
+								'March');
 				
 				$current_month = round(date('m'));		
 				$data_month = '';
 				for($i=0;$i<=11;$i++){
 					$data_month .=  "'".$month_name[$i]."',";
-				}	
+				}						
 				
-							
-				
-				$data['months'] = rtrim($data_month,",");	
-				
-				
+			$data['months'] = rtrim($data_month,",");			
+			$data['academic_year'] = $academic_year;	
 				//Last 5 Orders
-				$data['latest_orders'] = $orders = $this->Admin_model->get_last_booked_orders(5);
-				
-				
-				
-				// get cs hand book total sold count		
-			
-			
-			
-				//$data['css'][]='assets/themes/css/jquery.datetimepicker.css';
-					
-			
-			
-			
-					
+			$data['latest_orders'] = $orders = $this->Admin_model->get_last_booked_orders(5);
 			$data['main_content'] = 'admin/dashboard';
 			$data['page_title']  = 'Admin Dashboard';
 			$this->load->view(ADMIN_LAYOUT_PATH, $data); 
 		}
+
+		public function setyear(){
+			$data = $this->input->post();		
+			if($data['academic_year']){
+				$db_row = $this->base_model->getRow('academic_year','*',array('id' => $data['academic_year']));
+			   
+				if(!empty($db_row)){
+						
+						$this->session->set_userdata('order_year_from', $db_row->from_date); 
+						$this->session->set_userdata('order_year_to', $db_row->to_date); 
+						$this->session->set_userdata('academic_year_id', $db_row->id); 
+				}
+				
+			}
+			redirect(base_url().SITE_ADMIN_URI.'/admin/dashboard');			
+		}
+
 		public function profile()
 		{ 
 			if(!$this->session->has_userdata('admin_is_logged_in')){

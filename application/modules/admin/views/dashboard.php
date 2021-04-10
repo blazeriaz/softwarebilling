@@ -9,7 +9,16 @@
 			<div class="col-md-6" align="left">
 			   <h3>Dashboard</h3>
 	   	   </div>
-			<div class="col-md-6" align="right">
+        <div class="col-md-3" align="right">
+            <?php echo form_open(base_url().SITE_ADMIN_URI.'/admin/setyear','class="search_single"'); ?>
+                <select name="academic_year" onchange="this.form.submit()">
+                <?php foreach($academic_year as $year){ ?>
+                    <option <?= ($current_year_selected == $year['id']) ?'selected':''; ?> value="<?= $year['id']; ?>"><?= $year['label']; ?></option>
+                <?php } ?>
+                </select>
+                <?php echo form_close(); ?>	
+        </div>
+			<div class="col-md-3" align="right">
 			   <h3 id="countdown_timer"></h3>
 	   	   </div>		   
 		</div>
@@ -153,7 +162,7 @@
 	
 	jQuery(document).ready(function(){
 		
-		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		var MONTHS = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December','January', 'February', 'March'];
 		var color = Chart.helpers.color;
 		var barChartData = {
 			
