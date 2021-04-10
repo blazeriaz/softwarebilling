@@ -1,2 +1,2 @@
 # softwarebilling
-student edutcational billing code
+student educational billing code
