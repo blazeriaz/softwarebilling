@@ -1,0 +1,315 @@
+#Hari - 21 oct 2017
+
+ALTER TABLE `admin_availability_time_slot` ADD `time_duration` INT NOT NULL AFTER `time`;
+ALTER TABLE `admin_batch_list` ADD `duration_part` INT NOT NULL AFTER `class_id`;
+
+
+DROP TABLE product_type;
+
+CREATE TABLE `product_type` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `shortform` varchar(255) NOT NULL,
+  `class_count` int(11) NOT NULL,
+  `created` datetime NOT NULL,
+  `updated` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `product_type` ADD `time_duration` INT NOT NULL AFTER `class_count`;
+
+INSERT INTO `product_type` (`id`, `name`, `slug`, `shortform`, `class_count`, `time_duration`, `created`, `updated`) VALUES
+(1, 'Online Video Tutorials Type', 'online-video-tutorials', 'VID_TUT', 0, 0, '2017-10-12 18:41:10', '0000-00-00 00:00:00'),
+(2, 'Assesment Preparation Type', 'assesment-preparation', 'ASSES_PREP', 1, 1, '2017-10-12 18:45:58', '0000-00-00 00:00:00'),
+(3, 'Patient Note Correction Type', 'patient-note-correction', 'PNC', 1, 1, '2017-10-12 18:46:34', '0000-00-00 00:00:00'),
+(4, 'Webinar Type', 'webinar', 'WEBIN', 0, 0, '2017-10-12 18:47:33', '0000-00-00 00:00:00'),
+(5, 'Online Mock Exam Type', 'online-mock-exam', 'ON_MOCK', 1, 2, '2017-10-12 18:47:52', '0000-00-00 00:00:00'),
+(6, 'Live Mock Exam Type', 'live-mock-exam', 'LIV_MOCK', 0, 0, '2017-10-12 18:47:58', '0000-00-00 00:00:00'),
+(7, 'Combo Plan', 'combo-plan', 'COMBO_PLAN', 0, 0, '2017-10-12 18:48:08', '0000-00-00 00:00:00'),
+(8, 'Combo Package', 'combo-package', 'COMBO_PACK', 0, 0, '2017-10-12 18:48:16', '0000-00-00 00:00:00'),
+(9, 'Complete Comprehensive Course Type', 'complete-comprehensive-course', 'CCC', 6, 1, '2017-10-20 00:00:00', '0000-00-00 00:00:00'),
+(10, 'Rapid Review Course Type', 'rapid-review-course', 'RRC', 3, 1, '2017-10-12 18:47:06', '0000-00-00 00:00:00');
+
+ALTER TABLE `product_type` ADD PRIMARY KEY (`id`);
+  
+ALTER TABLE `product_type` MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+#Hari - 23 oct 2017
+
+ALTER TABLE `admin_availability_time_slot` ADD `timeslot_name` VARCHAR(255) NOT NULL AFTER `product_type_id`;
+ALTER TABLE `admin_availability_time_slot` ADD `batch_name` VARCHAR(255) NOT NULL AFTER `timeslot_name`;
+ALTER TABLE `admin_availability_time_slot` ADD `date_time` DATETIME NOT NULL AFTER `batch_name`;
+
+ALTER TABLE `admin_batch_list` ADD `date_time` DATETIME NOT NULL AFTER `duration_part`;
+
+#Hari 24Oct17
+
+ALTER TABLE `admin_availability_time_slot` CHANGE `is_users_available` `is_users_booked` TINYINT(1) NOT NULL;
+ALTER TABLE `users` ADD `exam_date` DATETIME NOT NULL AFTER `city`, ADD `exam_center` VARCHAR(255) NOT NULL AFTER `exam_date`;
+
+
+#Hari 25Oct17
+
+ALTER TABLE `admin_availability_time_slot` ADD `product_id` BIGINT NOT NULL AFTER `product_type_id`;
+ALTER TABLE `users_batch_time_slot` ADD `date_time` DATETIME NOT NULL AFTER `class_id`;
+ALTER TABLE `product` CHANGE `created` `created` DATETIME NOT NULL;
+ALTER TABLE `product` CHANGE `valid_days` `valid_days` INT(11) NULL;
+ALTER TABLE `product` CHANGE `valid_days` `valid_days` VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE `users_batch_time_slot` ADD `date_time` DATETIME NOT NULL AFTER `class_id`;
+
+#Hari 26Oct17
+
+ALTER TABLE `users_batch_time_slot` ADD `user_id` BIGINT NOT NULL AFTER `id`;
+ALTER TABLE `users_batch_time_slot` CHANGE `user_time_slot_id` `time_slot_id` BIGINT(20) NOT NULL;
+
+#Hari 28Oct17
+
+ALTER TABLE `users_time_slot` ADD `date_time` DATETIME NOT NULL AFTER `batch_id`;
+ALTER TABLE `users_batch_time_slot` CHANGE `time_slot_id` `user_time_slot_id` BIGINT(20) NOT NULL;
+
+ALTER TABLE `testimonial` ADD `designation` VARCHAR(255) NOT NULL AFTER `name`;
+ALTER TABLE `testimonial` ADD `location` VARCHAR(255) NOT NULL AFTER `designation`;
+
+#Hari 30Oct17
+
+ALTER TABLE `product_pnc_submit_list` CHANGE `created` `created` DATETIME NOT NULL;
+ALTER TABLE `product_pnc_content` CHANGE `created` `created` DATETIME NOT NULL;
+
+DROP TABLE IF EXISTS `site_settings_categories`;
+CREATE TABLE `site_settings_categories` (
+  `id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `description` text COLLATE utf8_unicode_ci NOT NULL,
+  `show_order` int(11) NOT NULL,
+  `is_show` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+INSERT INTO `site_settings_categories` (`id`, `created`, `modified`, `name`, `description`, `show_order`, `is_show`, `is_active`) VALUES
+(1, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'site', 'Site settings', 1, 1, 1),
+(2, '2017-10-10 00:00:00', '2017-10-10 00:00:00', 'meta', 'meta details', 2, 1, 1),
+(3, '2017-10-10 00:00:00', '2017-10-10 00:00:00', 'social', 'social settings', 3, 1, 1),
+(4, '2017-10-10 00:00:00', '2017-10-10 00:00:00', 'emailtemplate', 'email template settings', 4, 1, 1),
+(5, '2017-10-12 00:00:00', '2017-10-12 00:00:00', 'pagination', 'Pagination', 5, 1, 1),
+(6, '2017-10-28 00:00:00', '2017-10-28 00:00:00', 'step', 'Step', 0, 0, 1),
+(7, '2017-10-28 00:00:00', '2017-10-28 00:00:00', 'patientnotecorrection', 'Patient Note Correction', 0, 0, 1);
+
+ALTER TABLE `site_settings_categories`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `site_settings_categories`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  
+
+DROP TABLE IF EXISTS `site_settings`;
+CREATE TABLE `site_settings` (
+  `id` bigint(20) NOT NULL,
+  `setting_category_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `value` text NOT NULL,
+  `description` text NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `options` varchar(255) NOT NULL,
+  `include_class` varchar(255) NOT NULL,
+  `include_validation` varchar(255) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `sort_order` bigint(20) NOT NULL,
+  `is_show` tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `site_settings` (`id`, `setting_category_id`, `name`, `value`, `description`, `type`, `options`, `include_class`, `include_validation`, `label`, `sort_order`, `is_show`) VALUES
+(1, 1, 'site.name', 'Target USMLE', 'You can make changes in site name by using this value. ', 'text', '', '', 'trim|required', 'Site Name', 1, 1),
+(2, 1, 'site.date_format', 'M d, Y', 'You can make changes in date format of the site.', 'text', '', 'datepicker', 'trim|required', 'Date Format', 2, 0),
+(3, 1, 'site.datetime_format', 'M d, Y  g:i:s A', 'You can make changes in date time format of the site.', 'text', '', 'datepicker', 'trim|required', 'Date Time Format', 3, 0),
+(4, 2, 'meta.keywords', 'STEP 2 CS Exam', 'You can make changes homepage meta keywords in this.', 'textarea', '', '', 'trim|required', 'Meta Keywords', 1, 1),
+(5, 2, 'meta.description', 'TARGET USMLE is an learning site for STEP 2 CS Exam', 'You can make changes homepage meta description in this.', 'textarea', '', '', 'trim|required', 'Meta Description', 2, 1),
+(6, 4, 'emailtemplate.from_email', 'dr.maryjune@targetusmle.com', 'You can make changes in Template From email for admin.', 'text', '', 'email', 'trim|required|valid_email', 'From Email', 1, 1),
+(7, 4, 'emailtemplate.to_email', 'dr.maryjune@targetusmle.com', 'You can make changes in Template To email for admin.', 'text', '', 'email', 'trim|required|valid_email', 'To Email', 2, 1),
+(8, 4, 'emailtemplate.reply_email', 'dr.maryjune@targetusmle.com', 'You can make changes in Template Reply email for admin.', 'text', '', 'email', 'trim|required|valid_email', 'Reply Email', 3, 1),
+(9, 5, 'pagination.front', '10', 'You can make changes in front end pagination by using this value. ', 'text', '', 'numberOnly', 'trim|required|numeric', 'Front Pagination', 1, 1),
+(10, 5, 'pagination.back', '5', 'You can make changes in front end pagination by using this value. ', 'text', '', 'numberOnly', 'trim|required|numeric', 'Back Pagination', 2, 1),
+(11, 1, 'site.address', 'Target USMLE\r\nNo. 2 Reddipalayam Street, 1st Floor,\r\nMugappair West,\r\nChennai 600 037,\r\nINDIA. - See more at: https://www.targetusmle.com/contactus.php#sthash.tIVbm5te.dpuf', 'You can make changes in site address by using this value. ', 'textarea', '', '', 'trim|required', 'Address', 6, 1),
+(12, 1, 'site.phone', '+91-9789930077', 'You can make changes in phone number by using this value. ', 'text', '', '', 'trim|required|regex_match[/^(?=.*[0-9])[- +0-9]+$/]', 'Phone no', 4, 1),
+(13, 1, 'site.secondary_phone', '+91-9789930077', 'You can make changes in secondary phone number by using this value. ', 'text', '', '', 'trim|required|regex_match[/^(?=.*[0-9])[- +0-9]+$/]', 'Secondary Phone no', 5, 1),
+(14, 6, 'step.title1', 'Online Video Tutorials', 'You can make changes in title 1 by using this value. ', 'text', '', '', 'trim|required', 'Title 1', 1, 1),
+(15, 6, 'step.title_description', 'Step 2 CS preparation Tutorials', 'You can make changes in title description by using this value. ', 'text', '', '', 'trim|required', 'Title Description', 2, 1),
+(16, 6, 'step.title2', 'Asses My Preparation', 'You can make changes in title1 2by using this value. ', 'text', '', '', 'trim|required', 'Title 2', 3, 1),
+(17, 6, 'step.title_description', 'Onspot Assesment on your preparation', 'You can make changes in title description by using this value. ', 'text', '', '', 'trim|required', 'Title Description', 4, 1),
+(18, 6, 'step.step1_content', 'CS Typical History', 'You can make changes in step 1 content by using this value. ', 'text', '', '', 'trim|required', 'Step 1 Content', 5, 1),
+(19, 6, 'step.step2_content', 'System History', 'You can make changes in step 2 content by using this value. ', 'text', '', '', 'trim|required', 'Step 2 Content', 6, 1),
+(20, 6, 'step.step3_content', 'PE vidieos', 'You can make changes in step 3 content by using this value. ', 'text', '', '', 'trim|required', 'Step 3 Content', 7, 1),
+(21, 6, 'step.step4_content', 'Diff Diagnosis', 'You can make changes in step 4 content by using this value. ', 'text', '', '', 'trim|required', 'Step 4 Content', 8, 1),
+(22, 6, 'step.step5_content', 'CS:15 min cases', 'You can make changes in step 5 content by using this value. ', 'text', '', '', 'trim|required', 'Step 5 Content', 9, 1),
+(23, 6, 'step.step6_content', 'PTE: 10 min note', 'You can make changes in step 6 content by using this value. ', 'text', '', '', 'trim|required', 'Step 6 Content', 10, 1),
+(24, 6, 'step.step7_content', '<p>Present Case</p>\r\n<p>Patient Note</p>\r\n<p>Critique</p>', 'You can make changes in step 7 content by using this value. ', 'textarea', '', '', 'trim|required', 'Step 7 Content', 11, 1),
+(25, 6, 'step.bottom_line', 'We provide Best of Everything the complete package for your Exam', 'You can make changes in Bottom Line content by using this value. ', 'textarea', '', '', 'trim|required', 'Bottom Line', 12, 1),
+(26, 7, 'patientnotecorrection.title', 'PATIENT NOTE CORRECTION', 'You can make changes in Title by using this value. ', 'text', '', '', 'trim|required', 'Title', 1, 1),
+(27, 7, 'patientnotecorrection.content1', 'Lorem Ipsum Dolor?\r\n - Present a case in 15 min\r\n - Type patient note live', 'You can make changes in Content 1 by using this value. ', 'textarea', '', '', 'trim|required', 'Content 1', 2, 1),
+(28, 7, 'patientnotecorrection.video_url', 'http://www.youtube.com/video1', 'You can make changes in Video URL by using this value. ', 'text', '', '', 'trim|required', 'Vidoe URL', 3, 1),
+(29, 7, 'patientnotecorrection.content2', 'BOOK YOUR TIMESLOT\r\nLorem ipsum', 'You can make changes in content 2 by using this value. ', 'textarea', '', '', 'trim|required', 'Content 2', 4, 1),
+(30, 7, 'patientnotecorrection.durationtime', '10', 'You can make changes in duration time by using this value. ', 'text', '', '', 'trim|required', 'Duration Time', 5, 1),
+(31, 7, 'patientnotecorrection.history_content', 'Describe History ..', 'You can make changes in history content by using this value. ', 'textarea', '', '', 'trim|required', 'History Content', 6, 1),
+(32, 7, 'patientnotecorrection.physical_examination_content', 'Describe any Positive ..', 'You can make changes in physical examination content by using this value. ', 'textarea', '', '', 'trim|required', 'Physical Examination Content', 7, 1),
+(33, 7, 'patientnotecorrection.data_intepretation_content', 'Based on what ..', 'You can make changes in data intepretation content by using this value. ', 'textarea', '', '', 'trim|required', 'Data Intepretation Content', 8, 1),
+(34, 7, 'patientnotecorrection.examine_instruction_content', 'VITAL SIGNS\r\nTemperature 98.8 F\r\n\r\n', 'You can make changes in Examine Instruction content by using this value. ', 'textarea', '', '', 'trim|required', 'Examine Instruction Content', 9, 1);
+
+ALTER TABLE `site_settings`
+  ADD PRIMARY KEY (`id`);
+  
+ALTER TABLE `site_settings`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+ALTER TABLE `product_pnc__diagnosis` CHANGE `diagnosis_type` `diagnosis_type` ENUM('one','two','three','four') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+
+ALTER TABLE `orders` CHANGE `created` `created` DATETIME NOT NULL;
+
+#Hari 31Oct17
+
+INSERT INTO `email_templates` (`id`, `created`, `modified`, `from_email`, `reply_to`, `name`, `description`, `subject`, `email_content`, `email_variables`, `is_active`, `is_html`) VALUES
+(7, '2015-06-22 11:28:15', '0000-00-00 00:00:00', 'dr.maryjune@targetusmle.com', 'dr.maryjune@targetusmle.com', 'User Timeslot Creation', 'Target USMLE - Course Timeslot', 'Target USMLE - Course Timeslot', '<table border="0" cellpadding="0" cellspacing="0" xss="removed">\r\n <tbody>\r\n  <tr>\r\n   <td>\r\n   <table border="1" cellpadding="0" cellspacing="0" xss="removed">\r\n    <tbody>\r\n     <tr>\r\n      <td xss="removed"><img alt="[SITE_NAME]" src="[LOGO]" xss="removed"></td>\r\n     </tr>\r\n     <tr>\r\n      <td xss="removed">\r\n      <p>Hi <b>[USERNAME]</b> ,</p>\r\n\r\n      <p>           Your Timeslot for <strong>[PRODUCT_NAME] </strong>is created.</p>\r\n      [TABLE]\r\n\r\n      <p> </p>\r\n\r\n      <p> </p>\r\n\r\n      <p>Thanks & Regards,</p>\r\n\r\n      <p><b>[SITE_NAME]</b></p>\r\n      </td>\r\n     </tr>\r\n     <tr>\r\n      <td xss="removed"> </td>\r\n     </tr>\r\n    </tbody>\r\n   </table>\r\n   </td>\r\n  </tr>\r\n </tbody>\r\n</table>', NULL, 1, 1);
+
+ALTER TABLE `product_pnc_submit_list` ADD `attachment_id` VARCHAR(255) NOT NULL AFTER `attachment`;
+
+RENAME TABLE `targetusmle_dev`.`product_pnc__diagnosis` TO `targetusmle_dev`.`product_pnc_diagnosis`;
+
+INSERT INTO `site_settings_categories` (`id`, `created`, `modified`, `name`, `description`, `show_order`, `is_show`, `is_active`) VALUES (NULL, '2017-10-31 00:00:00', '2017-10-31 00:00:00', 'personal_coaching', 'Personal Coaching', '0', '0', '1');
+
+#Hari 1Nov17
+
+ALTER TABLE `product_attributes` ADD `content_four` TEXT NOT NULL AFTER `content_three`, ADD `content_five` TEXT NOT NULL AFTER `content_four`;
+
+#Hari 7Nov17
+
+ALTER TABLE `product_type` ADD `user_count` INT NOT NULL AFTER `class_count`;
+ALTER TABLE `product_mock_exam` ADD `date_time` DATETIME NOT NULL AFTER `city_id`;
+ALTER TABLE `product_mock_exam` CHANGE `created` `created` DATETIME NOT NULL;
+ALTER TABLE `product_mock_exam` ADD `location` TEXT NOT NULL AFTER `city_id`;
+
+#Hari 8Nov17
+
+ALTER TABLE `orders` ADD `prod_attr_country` BIGINT NOT NULL AFTER `valid_days`, ADD `prod_attr_city` BIGINT NOT NULL AFTER `prod_attr_country`, ADD `prod_attr_location` TEXT NOT NULL AFTER `prod_attr_city`, ADD `prod_attr_location_date` DATETIME NOT NULL AFTER `prod_attr_location`;
+
+ALTER TABLE `product_webinar` ADD `title` TEXT NOT NULL AFTER `id`;
+
+#Hari 9Nov17
+
+ALTER TABLE `users_webinar` ADD `webinar_id` BIGINT NOT NULL AFTER `skype_id`;
+
+ALTER TABLE `users_webinar` ADD `webinar_group_id` BIGINT NOT NULL AFTER `webinar_id`;
+
+ALTER TABLE `users_webinar` CHANGE `webinar_id` `webinar_id` TEXT NOT NULL;
+
+CREATE TABLE `order_item` (
+  `id` bigint(20) NOT NULL,
+  `order_id` varchar(255) NOT NULL,
+  `product_id` bigint(20) NOT NULL,
+  `product_type` bigint(20) NOT NULL,
+  `attr_title` text NOT NULL,
+  `attr_country` bigint(20) NOT NULL,
+  `attr_city` bigint(20) NOT NULL,
+  `attr_location` varchar(255) NOT NULL,
+  `attr_date_time` datetime NOT NULL,
+  `valid_days` int(11) NOT NULL,
+  `created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `product_webinar` ADD `modified` DATETIME NOT NULL AFTER `date_time`;
+
+ALTER TABLE `orders` ADD `user_email` VARCHAR(255) NOT NULL AFTER `user_last_name`;
+
+ALTER TABLE `product_webinar` ADD `group_id` BIGINT NOT NULL AFTER `product_id`;
+
+ALTER TABLE `order_item` CHANGE `id` `id` BIGINT(20) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `order_item` ADD PRIMARY KEY(`id`);
+
+#Hari 9Nov17
+
+ALTER TABLE `product_step_videos`
+  DROP `video_type`,
+  DROP `correction_type`;
+  
+ALTER TABLE `product_step_videos` CHANGE `file_url` `video_url` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+
+ALTER TABLE `product_step_videos` ADD `sort_order` INT NOT NULL AFTER `video_url`;
+
+ALTER TABLE `product_step_videos` ADD `title` TEXT NOT NULL AFTER `product_step_categories_id`;
+
+
+#Hari 17Nov17
+
+ALTER TABLE `product_step_videos` ADD `count_like` BIGINT NOT NULL AFTER `video_url`, ADD `count_view` BIGINT NOT NULL AFTER `count_like`;
+
+CREATE TABLE `users_step_video_liked` (
+  `id` bigint(20) NOT NULL,
+  `product_step_videos_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `users_step_video_liked`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `users_step_video_liked`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  
+#Dec - 9 -2017
+
+ALTER TABLE `users_batch_time_slot` ADD `duration_part` INT NOT NULL AFTER `date_time`;
+
+INSERT INTO `product_type` (`id`, `name`, `slug`, `shortform`, `class_count`, `user_count`, `time_duration`, `created`, `updated`) VALUES (NULL, 'Componsation_General', 'componsation-general', 'COMP_GEN', '1', '0', '1', '2017-12-09 00:00:00', '2017-12-09 00:00:00');
+
+INSERT INTO `product_type` (`id`, `name`, `slug`, `shortform`, `class_count`, `user_count`, `time_duration`, `created`, `updated`) VALUES (NULL, 'Componsation_ONMOCK', 'componsation-onmock', 'COMP_MOCK', '1', '0', '2', '2017-12-09 00:00:00', '2017-12-09 00:00:00');
+
+ALTER TABLE `users_time_slot` ADD `time_duration` INT NOT NULL AFTER `date_time`;
+
+INSERT INTO `product_type` (`id`, `name`, `slug`, `shortform`, `class_count`, `user_count`, `time_duration`, `created`, `updated`) VALUES (NULL, 'Componsation_RRC', 'componsation-rrc', 'COMP_RRC', '3', '3', '1', '2017-12-09 00:00:00', '2017-12-09 00:00:00');
+
+INSERT INTO `product_type` (`id`, `name`, `slug`, `shortform`, `class_count`, `user_count`, `time_duration`, `created`, `updated`) VALUES (NULL, 'Componsation_CCC', 'componsation-ccc', 'COMP_CCC', '6', '3', '1', '2017-12-09 00:00:00', '2017-12-09 00:00:00');
+
+==================== Riaz ======================
+ALTER TABLE `users` ADD `took_exam` BOOLEAN NOT NULL AFTER `city`;
+ALTER TABLE `users` CHANGE `took_exam` `took_step_one_exam` TINYINT(1) NOT NULL;
+ALTER TABLE `users` ADD `took_step_two_exam` BOOLEAN NOT NULL AFTER `took_step_one_exam`;
+
+==================== Riaz  October-30-2017 ======================
+ALTER TABLE `product_step_categories` ADD `sort_order` INT NOT NULL AFTER `description`;
+
+INSERT INTO `email_templates` (`id`, `created`, `modified`, `from_email`, `reply_to`, `name`, `description`, `subject`, `email_content`, `email_variables`, `is_active`, `is_html`) VALUES
+(6, '2015-06-22 11:28:15', '0000-00-00 00:00:00', 'hariharan@blazedream.com', NULL, 'Change Password Admin', 'Target USMLE - Change Password', 'Target USMLE - change Password', '<table border="0" cellpadding="0" cellspacing="0" xss=removed>\r\n <tbody>\r\n  <tr>\r\n   <td>\r\n   <table border="1" cellpadding="0" cellspacing="0" xss=removed>\r\n    <tbody>\r\n     <tr>\r\n      <td xss=removed><img alt="[SITET_NAME]" src="[LOGO]" xss=removed></td>\r\n     </tr>\r\n     <tr>\r\n      <td xss=removed>\r\n      <p>Hi <b>[USERNAME]</b> ,</p>\r\n\r\n      <p>           Your password has been changed by Admin.</p>\r\n                         <p> Email : [USER_EMAIL] </p>\r\n                         <p> Password : [PASSWORD] </p>\r\n      <p><strong><a href="[SITE_LINK]">Click here for link</a></strong></p>\r\n\r\n      <p> </p>\r\n\r\n      <p>Thanks & Regards,</p>\r\n\r\n      <p><b>[SITE_NAME]</b></p>\r\n      </td>\r\n     </tr>\r\n    </tbody>\r\n   </table>\r\n   </td>\r\n  </tr>\r\n </tbody>\r\n</table>', NULL, 1, 1);
+
+ALTER TABLE `testimonial` ADD `image` VARCHAR(255) NOT NULL AFTER `youtube_link`;
+
+==================== kathir  October-31-2017 ======================
+ALTER TABLE `product_mock_exam` CHANGE `timing` `timing` DATETIME NOT NULL;
+ALTER TABLE `product_mock_exam` CHANGE `type` `type` ENUM('Online','Live') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE `product_mock_exam` CHANGE `timing` `timing` TEXT NOT NULL;
+
+==================== Vinoth  Nov-09-2017 ======================
+ALTER TABLE `users` ADD `login_count` BIGINT(20) NOT NULL AFTER `modified`, ADD `last_login_time` DATETIME NOT NULL AFTER `login_count`;
+
+ALTER TABLE `users` ADD `uid_request_date` DATETIME NOT NULL AFTER `last_login_time`, ADD `uid` BIGINT(20) NOT NULL AFTER `uid_request_date`, ADD `uid_status` TINYINT NOT NULL AFTER `uid`;
+
+==================== Vinoth  Nov-29-2017 ======================
+CREATE TABLE `users_blog_liked` (
+  `id` bigint(20) NOT NULL,
+  `blog_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `created` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `users_blog_liked`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `users_blog_liked`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  
+ALTER TABLE `blogs` ADD `view_count` BIGINT NOT NULL AFTER `category_id`;
+
+==================== Vinoth  Dec-11-2017 ======================
+
+ALTER TABLE `users` ADD `other` VARCHAR(255) NOT NULL AFTER `know_about_us`;
